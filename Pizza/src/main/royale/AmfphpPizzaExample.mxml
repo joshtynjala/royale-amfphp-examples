@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<j:Application
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:js="library://ns.apache.org/royale/basic"
+	xmlns:mx="library://ns.apache.org/royale/mx"
+	xmlns:j="library://ns.apache.org/royale/jewel"
+	applicationComplete="initApp()">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+
+			import org.apache.royale.jewel.Alert;
+			import mx.rpc.remoting.RemoteObject;
+
+			private var _myConnection:RemoteObject;
+
+			private function initApp():void
+			{
+				_myConnection = new RemoteObject();
+				_myConnection.destination = "amfphpExamplesGateway"; 
+				_myConnection.endpoint = "../../../../Php/";
+				_myConnection.source = "PizzaService";						
+				_myConnection.addEventListener(ResultEvent.RESULT, handleResult);
+				_myConnection.addEventListener(FaultEvent.FAULT, handleFault);
+			}
+
+			private function onButtonClick():void
+			{
+				if (window.location.protocol == "file:")
+				{
+					Alert.show("Please access this example through a server, and not through the file system, as the gateway is set as a relative url. Alternatively, you can change the url in the service-config.xml file, clean the project, and rebuild");
+				}
+				else
+				{
+					_myConnection.getPizza();
+				}
+			}
+
+			private function handleResult(event:ResultEvent):void
+			{
+				Alert.show("pizza: " + event.result, "Message from Amfphp");
+			}
+			
+			private function handleFault(event:FaultEvent):void
+			{
+				Alert.show(event.fault.faultString, "Fault");
+			}
+			
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+	</fx:Declarations>
+
+	<j:beads>
+		<js:AMF0SupportBead/>
+		<js:ClassAliasBead/>
+		<js:MixinManager/>
+	</j:beads>
+    
+    <j:valuesImpl>
+        <js:SimpleCSSValuesImpl/>
+    </j:valuesImpl>
+
+	<j:initialView>
+		<j:ResponsiveView id="rootView">
+			<j:VGroup gap="2" width="100%" height="100%">
+				<j:beads>
+					<js:Paddings padding="10"/>
+				</j:beads>
+				<j:Label text="amfPHP Flex Pizza Example"/>
+				<j:Button text="Get a Pizza" click="onButtonClick()"/>
+			</j:VGroup>
+		</j:ResponsiveView>
+	</j:initialView>
+</j:Application>
